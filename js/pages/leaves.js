@@ -7,7 +7,8 @@
 
   ui.shell(me, "leaves", { title: "Leave requests", subtitle: "Approvals" });
 
-  const state = { tab: "pending", q: "" };
+  const tabParam = new URLSearchParams(location.search).get("tab");
+  const state = { tab: ["pending", "approved", "rejected", "all"].includes(tabParam) ? tabParam : "pending", q: "" };
   const view = document.getElementById("view");
   view.innerHTML = `
     <div class="toolbar reveal">

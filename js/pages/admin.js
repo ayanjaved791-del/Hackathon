@@ -58,30 +58,30 @@
     const sp = (fn) => charts.spark(week.map(fn));
 
     document.getElementById("kpis").innerHTML = `
-      <div class="card kpi ink tilt c-3 reveal in">
+      <a class="card kpi kpi-link ink tilt c-3 reveal in" href="employees.html" aria-label="Open employee list">
         <div class="kpi-top">Employees<span class="kpi-ic">${icon("users")}</span></div>
         <div class="kpi-val" data-count="${snap.total}">0</div>
         <div class="kpi-sub">${db.departments().length} departments</div>
         ${sp((d) => d.total)}
-      </div>
-      <div class="card kpi accent tilt c-3 reveal in">
+      </a>
+      <a class="card kpi kpi-link accent tilt c-3 reveal in" href="attendance.html?status=present&mode=log" aria-label="See who is present">
         <div class="kpi-top">Present today<span class="kpi-ic">${icon("check")}</span></div>
         <div class="kpi-val" data-count="${snap.present}">0</div>
         <div class="kpi-sub">${pct}% of team · ${snap.notyet} not in yet</div>
         ${sp((d) => d.present)}
-      </div>
-      <div class="card kpi spot tilt c-3 reveal in">
+      </a>
+      <a class="card kpi kpi-link spot tilt c-3 reveal in" href="attendance.html?status=late&mode=log" aria-label="See late arrivals">
         <div class="kpi-top">Late today<span class="kpi-ic" style="color:var(--warn)">${icon("clock")}</span></div>
         <div class="kpi-val" data-count="${snap.late}">0</div>
         <div class="kpi-sub">After ${D.time12(db.company().startTime)} + ${db.company().graceMinutes}m grace</div>
         ${sp((d) => d.late)}
-      </div>
-      <div class="card kpi spot tilt c-3 reveal in">
+      </a>
+      <a class="card kpi kpi-link spot tilt c-3 reveal in" href="leaves.html?tab=approved" aria-label="See approved leave">
         <div class="kpi-top">On leave<span class="kpi-ic" style="color:var(--sky)">${icon("plane")}</span></div>
         <div class="kpi-val" data-count="${snap.leave}">0</div>
         <div class="kpi-sub">${pending.length} request${pending.length === 1 ? "" : "s"} pending</div>
         ${sp((d) => d.leave)}
-      </div>`;
+      </a>`;
 
     /* trend */
     const company = db.company();

@@ -11,7 +11,8 @@
     actions: `<button class="btn" id="csvBtn">${icon("download")}<span class="lbl">CSV</span></button><button class="btn btn-dark" id="printBtn">${icon("printer")}<span class="lbl">Report</span></button>`,
   });
 
-  const state = { month: D.monthValue(), emp: "", status: "", mode: "matrix" };
+  const qs = new URLSearchParams(location.search);
+  const state = { month: qs.get("month") || D.monthValue(), emp: qs.get("emp") || "", status: qs.get("status") || "", mode: qs.get("mode") === "log" ? "log" : "matrix" };
   const view = document.getElementById("view");
   view.innerHTML = `
     <div class="print-only" id="printHead"></div>
@@ -25,6 +26,8 @@
     <div class="bento" id="sum" style="margin-bottom:16px"></div>
     <section class="card reveal" id="body"></section>`;
 
+  document.getElementById("emp").value = state.emp;
+  document.getElementById("status").value = state.status;
   ["month", "emp", "status"].forEach((id) => (document.getElementById(id).onchange = (e) => { state[id] = e.target.value; render(); }));
   document.querySelectorAll("#mode button").forEach((b) => (b.onclick = () => { state.mode = b.dataset.m; render(); }));
   document.getElementById("csvBtn").onclick = () => {

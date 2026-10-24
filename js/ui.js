@@ -322,6 +322,27 @@
     document.body.appendChild(dock);
 
     $$("[data-theme-toggle]").forEach((b) => (b.onclick = toggleTheme));
+
+    // A link to the page you're already on scrolls to the top instead of reloading.
+    document.addEventListener("click", (e) => {
+      const a = e.target.closest?.("a[href]");
+      if (!a || e.metaKey || e.ctrlKey || e.shiftKey) return;
+      const to = new URL(a.href, location.href);
+      if (to.pathname === location.pathname && to.search === location.search && !to.hash) {
+        e.preventDefault();
+        if (location.hash) history.replaceState(null, "", location.pathname + location.search);
+        scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+        syncActive();
+      }
+    });
+    const syncActive = () => {
+      const here = location.pathname.split("/").pop() + location.hash;
+      const match = nav.find((n) => n.href === here) || nav.find((n) => n.href === location.pathname.split("/").pop());
+      if (!match) return;
+      $$("[data-nav]").forEach((el) => el.classList.toggle("active", el.dataset.nav === match.id));
+      $$(".dock a").forEach((el) => el.classList.toggle("active", el.getAttribute("href") === match.href));
+    };
+    addEventListener("hashchange", syncActive);
     $$("[data-cmdk]").forEach((b) => (b.onclick = () => palette(user)));
     $("[data-user-menu]").onclick = () => userMenu(user);
     $("[data-more]", dock).onclick = () => userMenu(user, true);
@@ -339,7 +360,7 @@
       });
     });
     /* session ended elsewhere → leave */
-    HCM.store.onChange((k) => { if (k === HCM.KEYS.session && !HCM.auth.current()) location.replace(HCM.auth.PAGES.login); });
+    HCM.store.onChange((k) => { if (k === HCM.KEYS.session && !HCM.auth.leaving && !HCM.auth.current()) location.replace(HCM.auth.PAGES.login); });
 
     document.addEventListener("keydown", (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { e.preventDefault(); palette(user); }

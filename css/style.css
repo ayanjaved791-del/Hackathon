@@ -1062,3 +1062,9 @@ tbody tr:nth-child(4) { animation-delay: 0.16s; } tbody tr:nth-child(5) { animat
 }
 @media (prefers-reduced-motion: reduce) { .reveal { filter: none; } .avatar.live::after, .burst { display: none; } }
 @media print { .to-top, .tb-clock { display: none !important; } tbody tr { animation: none; } }
+
+/* clickable KPI cards */
+.kpi-link { color: inherit; cursor: pointer; }
+.kpi-link .kpi-ic { transition: transform 0.3s var(--spring); }
+.kpi-link:hover .kpi-ic { transform: rotate(-8deg) scale(1.1); }
+.kpi-link:focus-visible { outline: 2px solid var(--violet); outline-offset: 3px; }

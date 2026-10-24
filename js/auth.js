@@ -62,8 +62,9 @@
     },
 
     logout() {
+      auth.leaving = true; // stops the "session ended" listener from redirecting a second time
       db.clearSession();
-      location.href = PAGES.login;
+      location.replace(PAGES.login);
     },
 
     current() {

@@ -87,7 +87,7 @@
     if (!host) { host = document.createElement("div"); host.id = "toasts"; host.setAttribute("role", "status"); document.body.appendChild(host); }
     const el = document.createElement("div");
     el.className = `toast toast-${type}`;
-    el.innerHTML = `${icon(type === "ok" ? "check" : type === "bad" ? "alert" : "info")}<span>${esc(msg)}</span>`;
+    el.innerHTML = `${icon(type === "ok" ? "check" : type === "bad" ? "alert" : "info")}<span>${esc(msg)}</span><b class="toast-bar" style="animation-duration:${ms}ms"></b>`;
     host.appendChild(el);
     setTimeout(() => { el.classList.add("out"); setTimeout(() => el.remove(), 350); }, ms);
   }
@@ -261,16 +261,16 @@
   /* ---------------- shell ---------------- */
   const NAV = {
     admin: [
-      { id: "admin", label: "Dashboard", icon: "grid", href: "admin.html" },
-      { id: "employees", label: "Employees", icon: "users", href: "employees.html" },
+      { id: "admin", label: "Dashboard", short: "Home", icon: "grid", href: "admin.html" },
+      { id: "employees", label: "Employees", short: "People", icon: "users", href: "employees.html" },
       { id: "attendance", label: "Attendance", icon: "clock", href: "attendance.html" },
-      { id: "leaves", label: "Leave requests", icon: "plane", href: "leaves.html", badge: () => HCM.db.leaves().filter((l) => l.status === "pending").length },
+      { id: "leaves", label: "Leave requests", short: "Leave", icon: "plane", href: "leaves.html", badge: () => HCM.db.leaves().filter((l) => l.status === "pending").length },
       { id: "payslip", label: "Payslips", icon: "receipt", href: "payslip.html" },
       { id: "settings", label: "Settings", icon: "settings", href: "settings.html" },
     ],
     employee: [
-      { id: "employee", label: "My day", icon: "zap", href: "employee.html" },
-      { id: "myleaves", label: "My leave", icon: "plane", href: "employee.html#leave" },
+      { id: "employee", label: "My day", short: "Today", icon: "zap", href: "employee.html" },
+      { id: "myleaves", label: "My leave", short: "Leave", icon: "plane", href: "employee.html#leave" },
       { id: "payslip", label: "Payslip", icon: "receipt", href: "payslip.html" },
     ],
   };
@@ -281,17 +281,17 @@
     const main = $("#main");
     const navHTML = nav.map((n) => {
       const b = n.badge ? n.badge() : 0;
-      return `<a href="${n.href}" class="nav-item ${n.id === active ? "active" : ""}" data-nav="${n.id}">${icon(n.icon)}<span>${n.label}</span>${b ? `<em class="nav-badge">${b}</em>` : ""}</a>`;
+      return `<a href="${n.href}" class="nav-item ${n.id === active ? "active" : ""}" data-nav="${n.id}" data-label="${n.label}">${icon(n.icon)}<span>${n.label}</span>${b ? `<em class="nav-badge">${b}</em>` : ""}</a>`;
     }).join("");
 
     const side = document.createElement("aside");
     side.className = "sidebar";
     side.innerHTML = `
       <a class="brand" href="${nav[0].href}">${LOGO}<span><b>HCM Lite</b><small>${esc(company?.name || "")}</small></span></a>
-      <button class="search-trigger" data-cmdk>${icon("search")}<span>Search or jump…</span><kbd>⌘K</kbd></button>
+      <button class="search-trigger" data-cmdk data-label="Search · ⌘K" aria-label="Search">${icon("search")}<span>Search or jump…</span><kbd>⌘K</kbd></button>
       <nav class="nav">${navHTML}</nav>
       <div class="side-foot">
-        <button class="nav-item" data-theme-toggle>${icon("moon", "only-light")}${icon("sun", "only-dark")}<span>Theme</span></button>
+        <button class="nav-item" data-theme-toggle data-label="Theme">${icon("moon", "only-light")}${icon("sun", "only-dark")}<span>Theme</span></button>
         <button class="user-chip" data-user-menu>
           ${avatar(user)}
           <span class="uc-text"><b>${esc(user.name)}</b><small>${user.role === "admin" ? "Administrator" : esc(user.designation || "Employee")}</small></span>
@@ -301,7 +301,7 @@
 
     const dock = document.createElement("nav");
     dock.className = "dock";
-    dock.innerHTML = nav.slice(0, 5).map((n) => `<a href="${n.href}" class="${n.id === active ? "active" : ""}">${icon(n.icon)}<span>${n.label.split(" ")[0]}</span></a>`).join("") +
+    dock.innerHTML = nav.slice(0, 5).map((n) => `<a href="${n.href}" class="${n.id === active ? "active" : ""}">${icon(n.icon)}<span>${n.short || n.label}</span></a>`).join("") +
       `<button data-more>${icon("menu")}<span>More</span></button>`;
 
     const top = document.createElement("header");
@@ -309,7 +309,7 @@
     top.innerHTML = `
       <div class="tb-left">
         <a class="brand brand-mobile" href="${nav[0].href}">${LOGO}</a>
-        <div><p class="eyebrow">${esc(subtitle || D_long())}</p><h1 class="page-title">${accent(title || "")}</h1></div>
+        <div><p class="eyebrow">${esc(subtitle || D_long())}<span class="tb-clock mono" aria-hidden="true"></span></p><h1 class="page-title">${accent(title || "")}</h1></div>
       </div>
       <div class="tb-right">${actions}
         <button class="icon-btn hide-desk" data-cmdk aria-label="Search">${icon("search")}</button>
@@ -325,6 +325,7 @@
     $$("[data-cmdk]").forEach((b) => (b.onclick = () => palette(user)));
     $("[data-user-menu]").onclick = () => userMenu(user);
     $("[data-more]", dock).onclick = () => userMenu(user, true);
+    dock.addEventListener("pointerdown", () => navigator.vibrate?.(8));
 
     /* keep nav badges fresh when data changes in another tab */
     HCM.store.onChange((k) => {
@@ -371,8 +372,48 @@
       bar.style.transform = `scaleX(${max > 0 ? scrollY / max : 0})`;
       top?.classList.toggle("scrolled", scrollY > 12);
     };
+    const up = document.createElement("button");
+    up.className = "to-top"; up.setAttribute("aria-label", "Back to top"); up.innerHTML = icon("chevronRight");
+    up.onclick = () => scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+    document.body.appendChild(up);
+    const clock = $(".tb-clock");
+    const tick = () => clock && (clock.textContent = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }));
+    tick(); setInterval(tick, 15000);
+    addEventListener("scroll", () => up.classList.toggle("show", scrollY > 700), { passive: true });
     addEventListener("scroll", onScroll, { passive: true });
     onScroll();
+    enhance();
+    let queued = false;
+    new MutationObserver(() => { if (!queued) { queued = true; requestAnimationFrame(() => { queued = false; enhance(); }); } })
+      .observe($("#main"), { childList: true, subtree: true });
+    addEventListener("resize", () => requestAnimationFrame(enhance));
+  }
+
+  /* Runs after every render: gliding segment indicators + labels for phone-stacked tables. */
+  function enhance() {
+    $$(".seg").forEach((seg) => {
+      const on = seg.querySelector("button.on");
+      let ind = seg.querySelector(".seg-ind");
+      if (!on) { ind?.remove(); seg.classList.remove("glide"); return; }
+      if (!ind) { ind = document.createElement("span"); ind.className = "seg-ind"; seg.prepend(ind); }
+      seg.classList.add("glide");
+      ind.style.width = on.offsetWidth + "px";
+      ind.style.transform = `translateX(${on.offsetLeft}px)`;
+    });
+    $$(".table-wrap.stack table").forEach((t) => {
+      const heads = $$("thead th", t).map((th) => th.textContent.trim());
+      $$("tbody tr", t).forEach((tr) => [...tr.children].forEach((td, i) => { if (!td.hasAttribute("data-label")) td.setAttribute("data-label", heads[i] || ""); }));
+    });
+  }
+
+  /* Expanding rings from a point — used for check-in success. */
+  function burst(x = innerWidth / 2, y = innerHeight / 2) {
+    if (reduce) return;
+    ["", "b2"].forEach((c) => {
+      const r = document.createElement("i");
+      r.className = `burst ${c}`; r.style.left = x + "px"; r.style.top = y + "px";
+      document.body.appendChild(r); setTimeout(() => r.remove(), 1200);
+    });
   }
 
   /* welcome splash, shown once right after signing in */
@@ -486,5 +527,5 @@
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
   }
 
-  HCM.ui = { icon, LOGO, esc, $, $$, avatar, badge, leaveBadge, initials, hue, toast, modal, drawer, confirm, formData, showErrors, field, countUp, reveal, confetti, empty, shell, toggleTheme, setTheme, download, changePassword };
+  HCM.ui = { burst, icon, LOGO, esc, $, $$, avatar, badge, leaveBadge, initials, hue, toast, modal, drawer, confirm, formData, showErrors, field, countUp, reveal, confetti, empty, shell, toggleTheme, setTheme, download, changePassword };
 })();

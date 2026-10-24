@@ -81,6 +81,8 @@
     dayName(i, len = "short") {
       return new Date(2024, 0, 7 + i).toLocaleDateString(undefined, { weekday: len });
     },
+    /** 27 -> "27 min", 742 -> "12h 22m" */
+    late(min) { return min < 60 ? `${min} min` : D.hours(min / 60); },
     hours(h) {
       if (h == null || isNaN(h)) return "—";
       const total = Math.round(h * 60);

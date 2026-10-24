@@ -88,12 +88,12 @@
         <div class="legend">${[["present", "var(--ok)"], ["late", "var(--amber)"], ["half", "var(--violet)"], ["leave", "var(--sky)"], ["absent", "var(--bad)"]].map(([s, c]) => `<span><i style="background:${c}"></i>${A.STATUS[s].label}</span>`).join("")}<span><i style="border:1px dashed var(--line-2)"></i>Off day</span></div>`;
     } else {
       body.innerHTML = rows.length
-        ? `<div class="table-wrap" style="margin-top:-20px;border-top:0"><table>
+        ? `<div class="table-wrap stack" style="margin-top:-20px;border-top:0"><table>
             <thead><tr><th>Date</th><th>Employee</th><th>In</th><th>Out</th><th>Hours</th><th>Status</th><th>Method</th></tr></thead>
             <tbody>${rows.map((r) => `<tr>
               <td class="mono">${D.nice(r.date, { weekday: "short", day: "numeric", month: "short" })}</td>
               <td><div class="person">${avatar(r.user, "sm")}<div><b>${esc(r.user.name)}</b><small>${esc(r.user.department)}</small></div></div></td>
-              <td class="mono">${D.time(r.rec?.checkIn)}${r.ev?.late ? ` <small style="color:var(--warn)">+${r.ev.lateBy}m</small>` : ""}</td>
+              <td class="mono">${D.time(r.rec?.checkIn)}${r.ev?.late ? ` <small style="color:var(--warn)">+${D.late(r.ev.lateBy)}</small>` : ""}</td>
               <td class="mono">${D.time(r.rec?.checkOut)}</td>
               <td class="mono">${r.ev?.hours != null ? D.hours(r.ev.hours) : "—"}</td>
               <td>${badge(r.status)}</td>

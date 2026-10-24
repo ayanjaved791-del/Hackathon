@@ -19,7 +19,7 @@
         <div class="card-head"><div><h3>Attendance trend</h3><p>People present on each of the last 14 working days</p></div><a class="card-link" href="attendance.html">Records ${icon("arrowUpRight")}</a></div>
         <div id="trend"></div>
       </section>
-      <section class="card spot c-4 reveal">
+      <section class="card spot c-4 t-12 reveal">
         <div class="card-head"><div><h3>Today at a glance</h3><p id="todayLabel"></p></div></div>
         <div class="donut-row" id="donut"></div>
       </section>
@@ -30,15 +30,15 @@
       </section>
       <section class="card glow c-5 reveal" id="helper"></section>
 
-      <section class="card spot c-4 reveal">
+      <section class="card spot c-4 t-6 reveal">
         <div class="card-head"><div><h3>Live check-ins</h3><p>Today's punches</p></div><span class="badge tone-ok live"><i></i>Live</span></div>
         <div id="feed" class="feed"></div>
       </section>
-      <section class="card spot c-4 reveal">
+      <section class="card spot c-4 t-6 reveal">
         <div class="card-head"><div><h3>Pending leave</h3><p>Decide in one tap</p></div><a class="card-link" href="leaves.html">All ${icon("arrowUpRight")}</a></div>
         <div id="pending"></div>
       </section>
-      <section class="card spot c-4 reveal">
+      <section class="card spot c-4 t-12 reveal">
         <div class="card-head"><div><h3>Announcements</h3><p>Visible to every employee</p></div><button class="icon-btn sm" id="newAnn" aria-label="New announcement">${icon("plus")}</button></div>
         <div id="anns"></div>
       </section>
@@ -124,7 +124,7 @@
     const punched = snap.rows.filter((r) => r.rec).sort((a, b) => (b.rec.checkOut || b.rec.checkIn).localeCompare(a.rec.checkOut || a.rec.checkIn));
     document.getElementById("feed").innerHTML = punched.length
       ? punched.slice(0, 7).map((r) => `
-        <div class="feed-item">${avatar(r.user, "sm")}
+        <div class="feed-item">${avatar(r.user, r.rec.checkOut ? "sm" : "sm live")}
           <div class="grow"><b>${esc(r.user.name)}</b><small>${r.rec.checkOut ? "Checked out" : "Checked in"}${r.rec.method === "camera" ? " · 📷 face" : ""}</small></div>
           <div class="feed-time">${D.time(r.rec.checkOut || r.rec.checkIn)}<br>${badge(r.status)}</div>
         </div>`).join("")

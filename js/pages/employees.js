@@ -67,7 +67,7 @@
               <button class="icon-btn sm" data-del aria-label="Delete ${esc(e.name)}">${icon("trash")}</button>
             </div>
           </article>`).join("")}</div>`
-      : `<div class="card reveal"><div class="table-wrap" style="margin-top:-20px;border-top:0"><table>
+      : `<div class="card reveal"><div class="table-wrap stack" style="margin-top:-20px;border-top:0"><table>
           <thead><tr><th>Employee</th><th>Department</th><th>Joined</th><th>Salary</th><th>Leave left</th><th>Today</th><th></th></tr></thead>
           <tbody>${rows.map(({ e, st, bal }) => `<tr data-id="${e.id}">
             <td><div class="person">${avatar(e, "sm")}<div><b>${esc(e.name)}</b><small>${esc(e.email)}</small></div></div></td>

@@ -29,7 +29,7 @@
       const bal = L.balance(person.id);
       const rec = st.rec;
       return `${b(person.name)} (${ui.esc(person.designation)}, ${ui.esc(person.department)}) is ${b(A.STATUS[st.status].label.toLowerCase())} today` +
-        (rec?.checkIn ? ` — checked in at ${b(D.time(rec.checkIn))}${st.ev?.late ? ` (${st.ev.lateBy} min after start)` : ""}${rec.checkOut ? `, out at ${b(D.time(rec.checkOut))}` : ""}` : "") +
+        (rec?.checkIn ? ` — checked in at ${b(D.time(rec.checkIn))}${st.ev?.late ? ` (${D.late(st.ev.lateBy)} after start)` : ""}${rec.checkOut ? `, out at ${b(D.time(rec.checkOut))}` : ""}` : "") +
         `. Leave left this year: ${b(bal.left)} of ${bal.quota}.`;
     }
 
@@ -55,7 +55,7 @@
         return rows.length ? `Late arrivals this month: ${rows.slice(0, 5).map((r) => `${ui.esc(r.e.name)} (${r.n})`).join(", ")}.` : "No late arrivals this month.";
       }
       const late = snap().rows.filter((r) => r.ev?.late);
-      return late.length ? `${b(plural(late.length, "person"))} late today: ${late.map((r) => `${ui.esc(r.user.name)} (+${r.ev.lateBy}m)`).join(", ")}.` : "No one was late today. ⏱️";
+      return late.length ? `${b(plural(late.length, "person"))} late today: ${late.map((r) => `${ui.esc(r.user.name)} (+${D.late(r.ev.lateBy)})`).join(", ")}.` : "No one was late today. ⏱️";
     }
 
     if (has(t, "absent", "missing", "not checked", "hasn't", "haven't", "not in", "not come", "not here")) {
@@ -112,7 +112,7 @@
       const rec = A.record(me.id, today);
       if (!rec) return "You haven't checked in today yet.";
       const ev = A.evaluate(rec, company);
-      return ev.late ? `Yes — you checked in at ${b(D.time(rec.checkIn))}, ${b(ev.lateBy + " min")} after the ${D.time12(company.startTime)} start.` : `No, you were on time today — in at ${b(D.time(rec.checkIn))}. 👏`;
+      return ev.late ? `Yes — you checked in at ${b(D.time(rec.checkIn))}, ${b(D.late(ev.lateBy))} after the ${D.time12(company.startTime)} start.` : `No, you were on time today — in at ${b(D.time(rec.checkIn))}. 👏`;
     }
 
     if (has(t, "hour", "worked", "work time")) {

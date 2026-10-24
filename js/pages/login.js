@@ -22,6 +22,25 @@
     art.style.setProperty("--mx", `${e.clientX - r.left}px`);
     art.style.setProperty("--my", `${e.clientY - r.top}px`);
   });
+  // floating cards follow the cursor a little; the helper card "types" its answer
+  const floats = document.querySelector(".float-cards");
+  art.addEventListener("pointermove", (e) => {
+    const r = art.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
+    floats.style.transform = `translate(${x * -18}px, ${y * -12}px)`;
+  });
+  art.addEventListener("pointerleave", () => (floats.style.transform = ""));
+  const typed = document.getElementById("typed");
+  const answers = ["5 employees: 3 casual, 2 sick", "2 late today: Ali (+12m), Hina (+27m)", "You have 14 leave days left 🌴"];
+  if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    let a = 0;
+    const type = () => {
+      const text = answers[a++ % answers.length]; let i = 0;
+      typed.textContent = "";
+      const step = setInterval(() => { typed.textContent = text.slice(0, ++i); if (i >= text.length) { clearInterval(step); setTimeout(type, 2600); } }, 38);
+    };
+    setTimeout(type, 1800);
+  }
   const markSplash = () => { try { sessionStorage.setItem("hcm_splash", "1"); } catch (e) {} };
 
   // Already logged in? Go straight home.

@@ -14,8 +14,8 @@
   const view = document.getElementById("view");
   view.innerHTML = `
     <div class="bento">
-      <section class="card glow day-hero c-8 reveal" id="hero"></section>
-      <section class="card spot c-4 reveal" id="balance"></section>
+      <section class="card glow day-hero c-8 t-12 reveal" id="hero"></section>
+      <section class="card spot c-4 t-12 reveal" id="balance"></section>
 
       <section class="card spot c-7 reveal">
         <div class="card-head"><div><h3 id="calTitle"></h3><p>Your attendance, day by day</p></div>
@@ -41,11 +41,11 @@
         <div id="myLeaves"></div>
       </section>
 
-      <section class="card spot c-8 reveal">
+      <section class="card spot c-8 t-12 reveal">
         <div class="card-head"><div><h3>Recent attendance</h3><p>Your last 10 working days</p></div></div>
         <div id="recent"></div>
       </section>
-      <section class="card spot c-4 reveal">
+      <section class="card spot c-4 t-12 reveal">
         <div class="card-head"><div><h3>Announcements</h3><p>From your admin</p></div>${icon("megaphone")}</div>
         <div id="anns"></div>
       </section>
@@ -79,7 +79,7 @@
                  <button class="btn btn-lg" id="camBtn">${icon("camera")} Camera check-in</button>`;
     } else if (!rec.checkOut) {
       title = ev.late ? "Checked in — a little late" : "You're checked in ✓";
-      sub = ev.late ? `You arrived ${ev.lateBy} min after start. Work ${company.halfDayHours}h+ to avoid a half day.` : `Stay at least ${company.halfDayHours}h to avoid a half day.`;
+      sub = ev.late ? `You arrived ${D.late(ev.lateBy)} after start. Work ${company.halfDayHours}h+ to avoid a half day.` : `Stay at least ${company.halfDayHours}h to avoid a half day.`;
       actions = `<button class="btn btn-dark btn-lg punch" id="outBtn">${icon("logout")} Check out</button>`;
     } else {
       title = ev.half ? "Done — counted as a half day" : "That's a wrap for today 🎉";
@@ -136,7 +136,9 @@
     const r = A.checkIn(me.id, extra);
     if (r.error) return ui.toast(r.error, "bad");
     ui.confetti(e?.clientX, e?.clientY);
-    ui.toast(r.late ? `Checked in at ${D.time(r.record.checkIn)} — ${r.lateBy} min late` : `Checked in at ${D.time(r.record.checkIn)} — on time!`, r.late ? "info" : "ok");
+    ui.burst(e?.clientX, e?.clientY);
+    navigator.vibrate?.([20, 40, 20]);
+    ui.toast(r.late ? `Checked in at ${D.time(r.record.checkIn)} — ${D.late(r.lateBy)} late` : `Checked in at ${D.time(r.record.checkIn)} — on time!`, r.late ? "info" : "ok");
     renderAll();
   }
   async function doCheckOut() {
@@ -237,8 +239,8 @@
       if (days.length === 0 && k < D.addDays(D.today(), -60)) break;
     }
     document.getElementById("recent").innerHTML = days.length
-      ? `<div class="table-wrap" style="margin-top:-4px"><table><thead><tr><th>Date</th><th>In</th><th>Out</th><th>Hours</th><th>Status</th></tr></thead><tbody>
-        ${days.map((d) => `<tr><td class="mono">${D.nice(d.k, { weekday: "short", day: "numeric", month: "short" })}</td><td class="mono">${D.time(d.rec?.checkIn)}${d.ev?.late ? ` <small style="color:var(--warn)">+${d.ev.lateBy}m</small>` : ""}</td><td class="mono">${D.time(d.rec?.checkOut)}</td><td class="mono">${d.ev?.hours != null ? D.hours(d.ev.hours) : "—"}</td><td>${badge(d.status)}</td></tr>`).join("")}
+      ? `<div class="table-wrap stack" style="margin-top:-4px"><table><thead><tr><th>Date</th><th>In</th><th>Out</th><th>Hours</th><th>Status</th></tr></thead><tbody>
+        ${days.map((d) => `<tr><td class="mono">${D.nice(d.k, { weekday: "short", day: "numeric", month: "short" })}</td><td class="mono">${D.time(d.rec?.checkIn)}${d.ev?.late ? ` <small style="color:var(--warn)">+${D.late(d.ev.lateBy)}</small>` : ""}</td><td class="mono">${D.time(d.rec?.checkOut)}</td><td class="mono">${d.ev?.hours != null ? D.hours(d.ev.hours) : "—"}</td><td>${badge(d.status)}</td></tr>`).join("")}
         </tbody></table></div>`
       : ui.empty("No history yet", "Your check-ins will appear here.", "calendar");
   }

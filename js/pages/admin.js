@@ -28,7 +28,7 @@
         <div class="card-head"><div><h3>Attendance by department</h3><p>Today, live</p></div></div>
         <div id="dept"></div>
       </section>
-      <section class="card c-5 reveal" id="helper"></section>
+      <section class="card glow c-5 reveal" id="helper"></section>
 
       <section class="card spot c-4 reveal">
         <div class="card-head"><div><h3>Live check-ins</h3><p>Today's punches</p></div><span class="badge tone-ok live"><i></i>Live</span></div>
@@ -52,28 +52,35 @@
     const snap = A.companyDay(today);
     const pending = db.leaves().filter((l) => l.status === "pending");
     const pct = snap.total ? Math.round((snap.present / snap.total) * 100) : 0;
+    // last 7 working days for the KPI sparklines
+    const week = [];
+    for (let k = today; week.length < 7 && k > D.addDays(today, -30); k = D.addDays(k, -1)) if (D.isWorkingDay(k, db.company()) || k === today) week.unshift(A.companyDay(k));
+    const sp = (fn) => charts.spark(week.map(fn));
 
     document.getElementById("kpis").innerHTML = `
-      <div class="card kpi ink c-3 reveal in">
+      <div class="card kpi ink tilt c-3 reveal in">
         <div class="kpi-top">Employees<span class="kpi-ic">${icon("users")}</span></div>
         <div class="kpi-val" data-count="${snap.total}">0</div>
         <div class="kpi-sub">${db.departments().length} departments</div>
+        ${sp((d) => d.total)}
       </div>
-      <div class="card kpi accent c-3 reveal in">
+      <div class="card kpi accent tilt c-3 reveal in">
         <div class="kpi-top">Present today<span class="kpi-ic">${icon("check")}</span></div>
         <div class="kpi-val" data-count="${snap.present}">0</div>
         <div class="kpi-sub">${pct}% of team · ${snap.notyet} not in yet</div>
-        <div class="meter" style="color:var(--on-volt);background:rgba(0,0,0,.1)"><i style="--v:${pct}%"></i></div>
+        ${sp((d) => d.present)}
       </div>
-      <div class="card kpi spot c-3 reveal in">
+      <div class="card kpi spot tilt c-3 reveal in">
         <div class="kpi-top">Late today<span class="kpi-ic" style="color:var(--warn)">${icon("clock")}</span></div>
         <div class="kpi-val" data-count="${snap.late}">0</div>
         <div class="kpi-sub">After ${D.time12(db.company().startTime)} + ${db.company().graceMinutes}m grace</div>
+        ${sp((d) => d.late)}
       </div>
-      <div class="card kpi spot c-3 reveal in">
+      <div class="card kpi spot tilt c-3 reveal in">
         <div class="kpi-top">On leave<span class="kpi-ic" style="color:var(--sky)">${icon("plane")}</span></div>
         <div class="kpi-val" data-count="${snap.leave}">0</div>
         <div class="kpi-sub">${pending.length} request${pending.length === 1 ? "" : "s"} pending</div>
+        ${sp((d) => d.leave)}
       </div>`;
 
     /* trend */

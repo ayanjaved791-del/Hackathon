@@ -14,7 +14,7 @@
   const view = document.getElementById("view");
   view.innerHTML = `
     <div class="bento">
-      <section class="card spot day-hero c-8 reveal" id="hero"></section>
+      <section class="card glow day-hero c-8 reveal" id="hero"></section>
       <section class="card spot c-4 reveal" id="balance"></section>
 
       <section class="card spot c-7 reveal">
@@ -23,7 +23,7 @@
         <div class="mini-stats" id="monthStats" style="margin-bottom:16px"></div>
         <div id="calendar"></div>
       </section>
-      <section class="card c-5 reveal" id="helper"></section>
+      <section class="card glow c-5 reveal" id="helper"></section>
 
       <section class="card spot c-6 reveal" id="leave">
         <div class="card-head"><div><h3>Apply for leave</h3><p>Weekends and off days are skipped automatically</p></div></div>

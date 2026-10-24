@@ -212,6 +212,26 @@
     b.appendChild(s); setTimeout(() => s.remove(), 600);
   });
 
+  /* magnetic primary buttons + 3D tilt cards (mouse only) */
+  const finePointer = matchMedia("(hover: hover) and (pointer: fine)").matches;
+  if (finePointer && !reduce) {
+    document.addEventListener("pointermove", (e) => {
+      const m = e.target.closest?.(".btn-primary, .icon-btn.solid");
+      if (m) {
+        const r = m.getBoundingClientRect();
+        m.style.transform = `translate(${(e.clientX - r.left - r.width / 2) * 0.18}px, ${(e.clientY - r.top - r.height / 2) * 0.28}px)`;
+        m.onpointerleave = () => (m.style.transform = "");
+      }
+      const t = e.target.closest?.(".tilt");
+      if (t && !t.closest(".overlay")) {
+        const r = t.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
+        t.style.transform = `perspective(900px) rotateX(${(-y * 5).toFixed(2)}deg) rotateY(${(x * 6).toFixed(2)}deg) translateY(-3px)`;
+        t.onpointerleave = () => (t.style.transform = "");
+      }
+    }, { passive: true });
+  }
+
   function confetti(x = innerWidth / 2, y = innerHeight / 2) {
     if (reduce) return;
     const colors = ["#c8f43c", "#7c6cff", "#ff6b4a", "#2bb3e6", "#f5a524"];
@@ -289,7 +309,7 @@
     top.innerHTML = `
       <div class="tb-left">
         <a class="brand brand-mobile" href="${nav[0].href}">${LOGO}</a>
-        <div><p class="eyebrow">${esc(subtitle || D_long())}</p><h1 class="page-title">${title || ""}</h1></div>
+        <div><p class="eyebrow">${esc(subtitle || D_long())}</p><h1 class="page-title">${accent(title || "")}</h1></div>
       </div>
       <div class="tb-right">${actions}
         <button class="icon-btn hide-desk" data-cmdk aria-label="Search">${icon("search")}</button>
@@ -323,9 +343,51 @@
     document.addEventListener("keydown", (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") { e.preventDefault(); palette(user); }
     });
+    ambience();
+    splash(user);
     requestAnimationFrame(() => { reveal(); countUp(); });
   }
   const D_long = () => HCM.date.long();
+
+  /** Puts the last word (or the name after a comma) in serif italic. */
+  function accent(title) {
+    const i = title.lastIndexOf(", ");
+    if (i > -1) return `${title.slice(0, i + 2)}<span class="serif">${title.slice(i + 2)}</span>`;
+    const j = title.lastIndexOf(" ");
+    return j > -1 ? `${title.slice(0, j + 1)}<span class="serif">${title.slice(j + 1)}</span>` : `<span class="serif">${title}</span>`;
+  }
+
+  /* ---------------- luxe: ambient light, scroll glass, progress ---------------- */
+  function ambience() {
+    const amb = document.createElement("div");
+    amb.className = "ambient"; amb.setAttribute("aria-hidden", "true");
+    amb.innerHTML = "<i></i><i></i><i></i>";
+    const bar = document.createElement("div");
+    bar.className = "progress-bar";
+    document.body.append(amb, bar);
+    const top = $(".topbar");
+    const onScroll = () => {
+      const max = document.documentElement.scrollHeight - innerHeight;
+      bar.style.transform = `scaleX(${max > 0 ? scrollY / max : 0})`;
+      top?.classList.toggle("scrolled", scrollY > 12);
+    };
+    addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+  }
+
+  /* welcome splash, shown once right after signing in */
+  function splash(user) {
+    let flag = null;
+    try { flag = sessionStorage.getItem("hcm_splash"); sessionStorage.removeItem("hcm_splash"); } catch (e) {}
+    if (!flag || reduce) return;
+    const el = document.createElement("div");
+    el.className = "splash";
+    el.innerHTML = `<div class="aurora"><i></i><i></i><i></i></div><div class="splash-in">${LOGO}
+      <h2>${esc(HCM.date.greeting())}, <span class="serif">${esc(user.name.split(" ")[0])}</span></h2>
+      <p>${esc(HCM.db.company()?.name || "")} · ${esc(HCM.date.long())}</p><div class="splash-bar"><i></i></div></div>`;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 2000);
+  }
 
   function userMenu(user, mobile = false) {
     const nav = NAV[user.role];

@@ -80,6 +80,16 @@
       }, 80 + i * 120)));
     },
 
+    /** Tiny sparkline as an SVG string. values: number[] */
+    spark(values) {
+      if (!values.length) return "";
+      const w = 120, h = 34, max = Math.max(1, ...values), min = Math.min(...values);
+      const pts = values.map((v, i) => [(i / Math.max(1, values.length - 1)) * w, h - 3 - ((v - min) / Math.max(1, max - min)) * (h - 8)]);
+      const d = pts.map((p, i) => (i ? "L" : "M") + p[0].toFixed(1) + "," + p[1].toFixed(1)).join(" ");
+      const [lx, ly] = pts[pts.length - 1];
+      return `<svg class="spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" aria-hidden="true"><path class="f" d="${d} L${w},${h} L0,${h} Z"/><path class="l" d="${d}" vector-effect="non-scaling-stroke"/><circle cx="${lx}" cy="${ly}" r="2.6"/></svg>`;
+    },
+
     /** Progress ring: value 0..1 */
     ring(value, { size = 120, stroke = 10, color = "var(--volt)", track = "var(--line-2)" } = {}) {
       const r = (size - stroke) / 2, C = 2 * Math.PI * r;

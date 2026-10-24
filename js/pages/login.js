@@ -12,6 +12,18 @@
   themeBtn.innerHTML = icon("moon", "only-light") + icon("sun", "only-dark");
   themeBtn.onclick = ui.toggleTheme;
 
+  // art panel: live clock + cursor light
+  const art = document.querySelector(".auth-art");
+  const clock = document.getElementById("artClock");
+  const tick = () => (clock.textContent = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false }));
+  tick(); setInterval(tick, 1000);
+  art.addEventListener("pointermove", (e) => {
+    const r = art.getBoundingClientRect();
+    art.style.setProperty("--mx", `${e.clientX - r.left}px`);
+    art.style.setProperty("--my", `${e.clientY - r.top}px`);
+  });
+  const markSplash = () => { try { sessionStorage.setItem("hcm_splash", "1"); } catch (e) {} };
+
   // Already logged in? Go straight home.
   const me = auth.current();
   if (me) return location.replace(auth.home(me));
@@ -23,7 +35,7 @@
     const company = db.company();
     box.innerHTML = `
       <p class="step-label">${esc(company.name)}</p>
-      <h2>Welcome back.</h2>
+      <h2>Welcome <span class="serif">back.</span></h2>
       <p>Sign in with the email your admin set up for you.</p>
       <form id="loginForm" novalidate>
         <label class="field"><span class="label">Email</span>
@@ -46,6 +58,7 @@
       const r = auth.login(d.email, d.password);
       if (r.error) return showErrors(form, r.error);
       form.querySelector("button[type=submit]").innerHTML = `${icon("check")} Signed in`;
+      markSplash();
       setTimeout(() => (location.href = auth.home(r.user)), 250);
     };
   }
@@ -59,7 +72,7 @@
       <form id="setupForm" novalidate>
         <div class="step on" data-step="0">
           <p class="step-label">Step 1 of 3 · First-run setup</p>
-          <h2>Let's set up your company.</h2>
+          <h2>Let's set up your <span class="serif">company.</span></h2>
           <p class="muted">This takes under a minute. Everything stays in this browser.</p>
           ${field({ name: "companyName", label: "Company name", placeholder: "e.g. Saylani Tech", attrs: 'autocomplete="organization"' })}
           ${field({ name: "currency", label: "Currency", value: "PKR", options: ["PKR", "USD", "EUR", "GBP", "AED", "SAR", "INR"].map((c) => ({ value: c, label: c })) })}
@@ -68,7 +81,7 @@
 
         <div class="step" data-step="1">
           <p class="step-label">Step 2 of 3 · Work rules</p>
-          <h2>How does your day run?</h2>
+          <h2>How does your <span class="serif">day</span> run?</h2>
           <div class="form-grid">
             ${field({ name: "startTime", label: "Office start", type: "time", value: d.startTime })}
             ${field({ name: "graceMinutes", label: "Grace minutes", type: "number", value: d.graceMinutes, attrs: 'min="0" max="180"' })}
@@ -84,7 +97,7 @@
 
         <div class="step" data-step="2">
           <p class="step-label">Step 3 of 3 · Admin account</p>
-          <h2>Create your admin login.</h2>
+          <h2>Create your <span class="serif">admin</span> login.</h2>
           ${field({ name: "adminName", label: "Your name", placeholder: "Full name", attrs: 'autocomplete="name"' })}
           ${field({ name: "adminEmail", label: "Email", type: "email", placeholder: "admin@company.com", attrs: 'autocomplete="email"' })}
           ${field({ name: "adminPassword", label: "Password", type: "password", placeholder: "At least 6 characters", attrs: 'autocomplete="new-password"' })}
@@ -148,6 +161,7 @@
         admin: { name: v.adminName, email: v.adminEmail, password: v.adminPassword },
       });
       ui.confetti();
+      markSplash();
       setTimeout(() => (location.href = auth.PAGES.admin), 650);
     };
   }

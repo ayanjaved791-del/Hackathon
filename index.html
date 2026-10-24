@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>HCM Lite — Sign in</title>
+  <meta name="description" content="HCM Lite — a small, fast HR app for attendance, leave and payslips." />
+  <meta name="theme-color" content="#0a0b0f" />
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..700&family=Geist:wght@400..700&family=Geist+Mono:wght@400..600&display=swap" rel="stylesheet" />
+  <script>try{document.documentElement.dataset.theme=localStorage.getItem("hcm_theme")||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")}catch(e){document.documentElement.dataset.theme="light"}</script>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div class="auth">
+    <section class="auth-art" aria-hidden="true">
+      <div class="aurora"><i></i><i></i><i></i></div>
+      <a class="brand" href="index.html" id="artBrand"></a>
+      <div>
+        <h1 class="hero-type"><span><em>People ops,</em></span><span><em>beautifully</em></span><span><em>simple.</em></span></h1>
+        <p class="hero-sub">Attendance, leave and payslips for small teams — with a helper that actually knows your numbers.</p>
+        <div class="float-cards">
+          <div class="fcard f1"><small>Present today</small><b>42</b><div class="fbars"><i style="height:40%"></i><i style="height:65%"></i><i style="height:52%"></i><i class="hi" style="height:90%"></i><i style="height:70%"></i><i style="height:58%"></i></div></div>
+          <div class="fcard f2"><div class="fchat"><span class="helper-orb"><i></i></span><div><small>Who is on leave today?</small><div style="margin-top:4px">5 employees: 3 casual, 2 sick</div></div></div></div>
+          <div class="fcard f3"><small>Check-in</small><b>08:57</b><small>Face ✓ · Inside office ✓</small></div>
+        </div>
+      </div>
+      <div class="auth-foot" id="artFoot"></div>
+    </section>
+
+    <section class="auth-panel">
+      <div class="auth-tools"><button class="icon-btn" id="themeBtn" aria-label="Toggle theme"></button></div>
+      <div class="auth-box" id="authBox"></div>
+    </section>
+  </div>
+
+  <script src="js/storage.js"></script>
+  <script src="js/dates.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/leave.js"></script>
+  <script src="js/attendance.js"></script>
+  <script src="js/employees.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/pages/login.js"></script>
+</body>
+</html>

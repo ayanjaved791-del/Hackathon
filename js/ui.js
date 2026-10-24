@@ -77,8 +77,9 @@
   }
   function toggleTheme() {
     const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
-    if (document.startViewTransition) document.startViewTransition(() => setTheme(next));
-    else setTheme(next);
+    if (!document.startViewTransition) return setTheme(next);
+    const t = document.startViewTransition(() => setTheme(next));
+    [t.ready, t.finished].forEach((pr) => pr.catch(() => {}));
   }
 
   /* ---------------- toasts ---------------- */

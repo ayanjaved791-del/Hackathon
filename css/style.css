@@ -5,7 +5,8 @@
    type, Geist body, bento cards with cursor spotlight.
    ========================================================= */
 
-@view-transition { navigation: auto; }
+/* Page-to-page fade on larger screens; phones skip it (mobile browser bars resize the viewport mid-transition). */
+@media (min-width: 901px) { @view-transition { navigation: auto; } }
 
 :root {
   --bg: #f2f1ea;
@@ -1068,3 +1069,12 @@ tbody tr:nth-child(4) { animation-delay: 0.16s; } tbody tr:nth-child(5) { animat
 .kpi-link .kpi-ic { transition: transform 0.3s var(--spring); }
 .kpi-link:hover .kpi-ic { transform: rotate(-8deg) scale(1.1); }
 .kpi-link:focus-visible { outline: 2px solid var(--violet); outline-offset: 3px; }
+
+/* segmented tabs never push the page wider than a phone */
+.seg { max-width: 100%; overflow-x: auto; scrollbar-width: none; }
+.seg::-webkit-scrollbar { display: none; }
+.seg button { flex: none; white-space: nowrap; }
+@media (max-width: 640px) {
+  .toolbar > .seg { flex: 1 1 100%; }
+  .toolbar > .seg button { flex: 1 0 auto; justify-content: center; padding: 7px 9px; font-size: 12.5px; }
+}

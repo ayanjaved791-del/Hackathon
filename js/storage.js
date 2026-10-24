@@ -47,6 +47,12 @@
     if (e.key && e.key.startsWith("hcm_")) emit(e.key);
   });
 
+  /* A page transition can be cancelled by the browser (e.g. the viewport resizes mid-way).
+     That is harmless, so swallow the rejection instead of logging an error. */
+  const quiet = (e) => { const t = e.viewTransition; if (t) [t.ready, t.finished, t.updateCallbackDone].forEach((pr) => pr?.catch(() => {})); };
+  window.addEventListener("pagereveal", quiet);
+  window.addEventListener("pageswap", quiet);
+
   const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 
   const DEFAULT_COMPANY = {
